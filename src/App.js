@@ -3,16 +3,17 @@ import {
   Routes, 
   createBrowserRouter,
   RouterProvider,
-  Link
+  Outlet
  } from 'react-router-dom'
 
 import './App.css';
 import HomePage from './pages/HomePage/HomePage.component';
 import ShopPage from './pages/ShopPage/shopPage.component';
+import Hats from './pages/Hats/hats.component';
+import Header from './components/Header/header.component';
 
 const router = createBrowserRouter([
   {path: "*", Component: Root},
-  {path: "/", Component: HomePage, },
   ]
 ) 
 
@@ -20,10 +21,23 @@ function App() {
   return <RouterProvider router= {router} />
 }
 
+function Layout() {
+  return(
+    <>
+      <Header/>
+      <Outlet/>
+    </>
+  )
+}
+
 function Root() {
   return (
     <Routes className="App">
-      <Route path="/shop" element={<ShopPage/>} />
+      <Route element={<Layout/>}>
+        <Route path="/" element={<HomePage/>} />
+        <Route path="/shop" element={<ShopPage/>} />
+        <Route path="/shop/hats" element={<Hats/>} />
+      </Route>
     </Routes>
   );
 }
