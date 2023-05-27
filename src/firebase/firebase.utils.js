@@ -1,5 +1,5 @@
 import {initializeApp} from 'firebase/app'
-import {getFirestore} from 'firebase/firestore'
+import {getFirestore, doc, getDoc} from 'firebase/firestore'
 import {
   getAuth, 
   signInWithEmailAndPassword, 
@@ -21,7 +21,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
-export const firestore = getFirestore(app)
+export const db = getFirestore(app)
 
 const provider = new GoogleAuthProvider()
 provider.setCustomParameters({'prompt' : 'select_account'})
@@ -32,6 +32,14 @@ export const signInWithGoogle = async() => {
     console.log(error)
   }
   
+}
+const docRef = doc(db, "users", "USkSxkeEOqyLEKafuhdn") 
+const docSnap = await getDoc(docRef)
+
+if(docSnap){
+  console.log(docSnap)
+}else{
+
 }
 
 export const logOut = async() =>{
