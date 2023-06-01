@@ -1,12 +1,10 @@
 import {initializeApp} from 'firebase/app'
-import {getFirestore, doc, getDoc} from 'firebase/firestore'
+import {doc, getDoc, getFirestore, setDoc,} from 'firebase/firestore'
 import {
-  getAuth, 
-  signInWithEmailAndPassword, 
+  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
-  signInWithRedirect,
-  signOut
+  signOut,
 } from 'firebase/auth'
 
 const firebaseConfig = {
@@ -33,13 +31,30 @@ export const signInWithGoogle = async() => {
   }
   
 }
-const docRef = doc(db, "users", "USkSxkeEOqyLEKafuhdn") 
-const docSnap = await getDoc(docRef)
 
-if(docSnap){
-  console.log(docSnap)
-}else{
+export const createProfileUserDocument = async(userAuth, additionalData ) => {
+  if(!userAuth) return;
 
+  const userRef = doc(db,'users', `${userAuth.uid}`)
+  const userSnap = await getDoc(userRef) 
+  // console.log(userSnap)
+
+  if(!userSnap.exists()){
+    const createdAt = new Date()
+    
+    try {
+      const docRef = await setDoc(doc(db, 'users',`${userAuth.uid}` ), {
+        email: userAuth.email,
+        createdAt: createdAt,
+        ...additionalData
+      })
+      console.log('id user',docRef)
+    }catch(e){
+      console.log('Error adding a user',e)
+    }
+  }
+
+  return userRef 
 }
 
 export const logOut = async() =>{
