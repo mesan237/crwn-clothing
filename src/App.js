@@ -4,6 +4,8 @@ import {
   createBrowserRouter,
   RouterProvider,
   Outlet,
+  redirect,
+  Navigate
  } from 'react-router-dom'
  import React, { useEffect } from 'react';
  import { useDispatch, useSelector } from 'react-redux';
@@ -22,8 +24,6 @@ import { setcurrentuser } from './redux/user/userSlice';
 function App() {
   return <RouterProvider router= {router} />
 }
-
-
 
 function Layout() {
   return(
@@ -71,7 +71,7 @@ const Root = () => {
       <Route element={<Layout/>}>
         <Route path="/" element={<HomePage/>} />
         <Route path="/shop" element={<ShopPage/>} />
-        <Route path="/sign" element={<SignInAndSignUp/>} />
+        <Route path="/sign" element={!currentuser? <SignInAndSignUp/> : <Navigate to='/' />} />
         <Route path="/shop/hats" element={<Hats/>} />
       </Route>
     </Routes>
