@@ -5,7 +5,10 @@ import {
   RouterProvider,
   Outlet,
  } from 'react-router-dom'
- import React from 'react';
+ import React, { useEffect } from 'react';
+ import { useDispatch, useSelector } from 'react-redux';
+ import { onSnapshot } from 'firebase/firestore';
+ import { onAuthStateChanged } from 'firebase/auth';
 
 import './App.css';
 import HomePage from './pages/HomePage/HomePage.component';
@@ -14,8 +17,7 @@ import Hats from './pages/Hats/hats.component';
 import Header from './components/Header/header.component';
 import SignInAndSignUp from './pages/SignIn-and-signUp/SignIn-and-signUp.component';
 import { auth, createProfileUserDocument} from './firebase/firebase.utils';
-import { onAuthStateChanged } from 'firebase/auth';
-import { onSnapshot } from 'firebase/firestore';
+import { setcurrentuser } from './redux/user/userSlice';
 
 function App() {
   return <RouterProvider router= {router} />
@@ -32,56 +34,48 @@ function Layout() {
   )
 }
 
-class Root extends React.Component {  
-  constructor() {
-    super()
 
-    this.state = {
-      currentUser: null
-    }
-  }
-  unsubscribeFromAuth = null
+
+const Root = () => { 
+  const currentuser = useSelector(state => state.users.currentUser)
+  const dispatch = useDispatch()
   
-  componentDidMount() {
-    this.unsubscribeFromAuth = onAuthStateChanged(auth, async(userAuth) => {
+  useEffect(() => {
+  
+    const unsubscribeFromAuth = () =>  {onAuthStateChanged(auth, async(userAuth) => {
       if(userAuth){
         const userRef = await createProfileUserDocument(userAuth)
 
         onSnapshot(userRef, (doc) => {
-          this.setState({
-            currentUser : {
+          dispatch(setcurrentuser({
               id: doc.id,
               ...doc.data()
-            }
-          }, 
-          // () => console.log(this.state)
-          )
+            }))
         })
+        
+        console.log('before', userAuth)
       }else {
-        this.setState({currentUser: userAuth})
+        dispatch(setcurrentuser(userAuth))
       }
 
-    })
-    
-  }
+    })}
 
-  componentWillUnmount() {
-    this.unsubscribeFromAuth()
-  }
+    return() => {
+      console.log(currentuser)
+      unsubscribeFromAuth()
+    }
+  }, [])
   
-  render() {
-
-    return (
-      <Routes className="App">
-        <Route element={<Layout/>}>
-          <Route path="/" element={<HomePage/>} />
-          <Route path="/shop" element={<ShopPage/>} />
-          <Route path="/sign" element={<SignInAndSignUp/>} />
-          <Route path="/shop/hats" element={<Hats/>} />
-        </Route>
-      </Routes>
-    )
-  }
+  return (
+    <Routes className="App">
+      <Route element={<Layout/>}>
+        <Route path="/" element={<HomePage/>} />
+        <Route path="/shop" element={<ShopPage/>} />
+        <Route path="/sign" element={<SignInAndSignUp/>} />
+        <Route path="/shop/hats" element={<Hats/>} />
+      </Route>
+    </Routes>
+  )
 }
 
 const router = createBrowserRouter([

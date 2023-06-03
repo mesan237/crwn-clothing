@@ -1,12 +1,14 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {auth, logOut } from '../../firebase/firebase.utils'
+import {logOut } from '../../firebase/firebase.utils'
 
 import './header.styles.scss'
 import { ReactComponent as Logo } from '../../assets/084 crown.svg'
+import { useSelector } from 'react-redux'
 
 const Header = () => {
-  const user = auth.currentUser
+  // const user = auth.currentUser
+  const currentuser = useSelector(state => state.users.currentUser)
   // console.log(user)
   return (
     <div className='header'>
@@ -17,7 +19,7 @@ const Header = () => {
         <Link className='option' to='/shop'>Shop</Link>
         <Link className='option' to='/contact'>contact</Link>
         {
-          user?
+          currentuser?
           (<div className='option' onClick={() =>  logOut()}>
             Sign Out
           </div>)
